@@ -21,6 +21,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] Transform SpawnPoint;
     [SerializeField] Transform BeatPoint;
 
+    AudioSource Music;
+
     float PlayTime;
     float Distance;
     float During;
@@ -29,9 +31,7 @@ public class GameManager : MonoBehaviour
 
     float CheckRange;
     float BeatRange;
-    List<float> NoteTimings; // 追加
-
-    AudioSource Music;
+    List<float> NoteTimings;
 
     string Title;
     int BPM;
@@ -39,7 +39,6 @@ public class GameManager : MonoBehaviour
 
     Subject<string> SoundEffectSubject = new Subject<string>();
 
-    // イベントを検知するオブザーバーを追加
     public IObservable<string> OnSoundEffect
     {
         get { return SoundEffectSubject; }
@@ -54,7 +53,6 @@ public class GameManager : MonoBehaviour
         get { return MessageEffectSubject; }
     }
 
-
     void OnEnable()
     {
         Music = this.GetComponent<AudioSource>();
@@ -64,8 +62,8 @@ public class GameManager : MonoBehaviour
         isPlaying = false;
         GoIndex = 0;
 
-        CheckRange = 120; // 追加
-        BeatRange = 80; // 追加
+        CheckRange = 120;
+        BeatRange = 80;
 
         Play.onClick
           .AsObservable()
@@ -84,30 +82,27 @@ public class GameManager : MonoBehaviour
               GoIndex++;
           });
 
-        // 追加
         this.UpdateAsObservable()
           .Where(_ => isPlaying)
           .Where(_ => Input.GetKeyDown(KeyCode.F) || Input.GetKeyDown(KeyCode.J))
           .Subscribe(_ => {
               beat("don", Time.time * 1000 - PlayTime);
-              SoundEffectSubject.OnNext("don"); // イベントを通知
-
+              SoundEffectSubject.OnNext("don");
           });
 
-        // 追加
         this.UpdateAsObservable()
           .Where(_ => isPlaying)
           .Where(_ => Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.K))
           .Subscribe(_ => {
               beat("ka", Time.time * 1000 - PlayTime);
-              SoundEffectSubject.OnNext("ka"); // イベントを通知
+              SoundEffectSubject.OnNext("ka");
           });
     }
 
     void loadChart()
     {
         Notes = new List<GameObject>();
-        NoteTimings = new List<float>(); // 追加
+        NoteTimings = new List<float>();
 
         string jsonText = Resources.Load<TextAsset>(FilePath).ToString();
         Music.clip = (AudioClip)Resources.Load(ClipPath);
@@ -138,7 +133,7 @@ public class GameManager : MonoBehaviour
             Note.GetComponent<NoteController>().setParameter(type, timing);
 
             Notes.Add(Note);
-            NoteTimings.Add(timing); // 追加
+            NoteTimings.Add(timing);
         }
     }
 
@@ -151,13 +146,12 @@ public class GameManager : MonoBehaviour
         Debug.Log("Game Start!");
     }
 
-    // 追加
     void beat(string type, float timing)
     {
         float minDiff = -1;
         int minDiffIndex = -1;
 
-        for (int i = 0; i < NoteTimings.Count; i++)
+        for (int i = 0; i < Notes.Count; i++)
         {
             if (NoteTimings[i] > 0)
             {
@@ -176,15 +170,17 @@ public class GameManager : MonoBehaviour
             {
                 NoteTimings[minDiffIndex] = -1;
                 Notes[minDiffIndex].SetActive(false);
-                Debug.Log("beat " + type + " success.");
+
                 MessageEffectSubject.OnNext("good"); // イベントを通知
+                Debug.Log("beat " + type + " success.");
             }
             else
             {
                 NoteTimings[minDiffIndex] = -1;
                 Notes[minDiffIndex].SetActive(false);
-                Debug.Log("beat " + type + " failure.");
+
                 MessageEffectSubject.OnNext("failure"); // イベントを通知
+                Debug.Log("beat " + type + " failure.");
             }
         }
         else
