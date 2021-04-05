@@ -21,6 +21,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] Transform SpawnPoint;
     [SerializeField] Transform BeatPoint;
 
+    [SerializeField] Text ScoreText; // 追加
+    [SerializeField] Text ComboText; // 追加
+    [SerializeField] Text TitleText; // 追加
+
     AudioSource Music;
 
     float PlayTime;
@@ -28,6 +32,14 @@ public class GameManager : MonoBehaviour
     float During;
     bool isPlaying;
     int GoIndex;
+
+    float ComboCount; // 追加
+    float Score; // 追加
+    float ScoreFirstTerm; // 追加
+    float ScoreTorerance; // 追加
+    float ScoreCeilingPoint; // 追加
+    int CheckTimingIndex; // 追加
+
 
     float CheckRange;
     float BeatRange;
@@ -80,6 +92,24 @@ public class GameManager : MonoBehaviour
           .Subscribe(_ => {
               Notes[GoIndex].GetComponent<NoteController>().go(Distance, During);
               GoIndex++;
+          });
+
+        // 追加
+        this.UpdateAsObservable()
+          .Where(_ => isPlaying)
+          .Where(_ => Notes.Count > CheckTimingIndex)
+          .Where(_ => NoteTimings[CheckTimingIndex] == -1)
+          .Subscribe(_ => CheckTimingIndex++);
+
+        // 追加
+        this.UpdateAsObservable()
+          .Where(_ => isPlaying)
+          .Where(_ => Notes.Count > CheckTimingIndex)
+          .Where(_ => NoteTimings[CheckTimingIndex] != -1)
+          .Where(_ => NoteTimings[CheckTimingIndex] < ((Time.time * 1000 - PlayTime) - CheckRange / 2))
+          .Subscribe(_ => {
+              updateScore("failure");
+              CheckTimingIndex++;
           });
 
         this.UpdateAsObservable()
@@ -135,8 +165,34 @@ public class GameManager : MonoBehaviour
             Notes.Add(Note);
             NoteTimings.Add(timing);
         }
-    }
 
+    TitleText.text = Title;  // 追加
+
+    // 追加
+    if(Notes.Count< 10) {
+      ScoreFirstTerm = (float) Math.Round(ScoreCeilingPoint/Notes.Count);
+    ScoreTorerance = 0;
+    } else if (10 <= Notes.Count && Notes.Count < 30)
+{
+    ScoreFirstTerm = 300;
+    ScoreTorerance = (float)Math.Floor((ScoreCeilingPoint - ScoreFirstTerm * Notes.Count) / (Notes.Count - 9));
+}
+else if (30 <= Notes.Count && Notes.Count < 50)
+{
+    ScoreFirstTerm = 300;
+    ScoreTorerance = (float)Math.Floor((ScoreCeilingPoint - ScoreFirstTerm * Notes.Count) / (2 * (Notes.Count - 19)));
+}
+else if (50 <= Notes.Count && Notes.Count < 100)
+{
+    ScoreFirstTerm = 300;
+    ScoreTorerance = (float)Math.Floor((ScoreCeilingPoint - ScoreFirstTerm * Notes.Count) / (4 * (Notes.Count - 39)));
+}
+else
+{
+    ScoreFirstTerm = 300;
+    ScoreTorerance = (float)Math.Floor((ScoreCeilingPoint - ScoreFirstTerm * Notes.Count) / (4 * (3 * Notes.Count - 232)));
+}
+  }
     void play()
     {
         Music.Stop();
@@ -172,7 +228,8 @@ public class GameManager : MonoBehaviour
                 Notes[minDiffIndex].SetActive(false);
 
                 MessageEffectSubject.OnNext("good"); // イベントを通知
-                Debug.Log("beat " + type + " success.");
+                //Debug.Log("beat " + type + " success.");
+                updateScore("good"); // 追加
             }
             else
             {
@@ -180,12 +237,58 @@ public class GameManager : MonoBehaviour
                 Notes[minDiffIndex].SetActive(false);
 
                 MessageEffectSubject.OnNext("failure"); // イベントを通知
-                Debug.Log("beat " + type + " failure.");
+                //Debug.Log("beat " + type + " failure.");
+                updateScore(" failure"); // 追加
             }
         }
         else
         {
             Debug.Log("through");
         }
+    }
+
+    void updateScore(string result)
+    {
+        if (result == "good")
+        {
+            ComboCount++;
+
+            float plusScore;
+            if (ComboCount < 10)
+            {
+                plusScore = ScoreFirstTerm;
+            }
+            else if (10 <= ComboCount && ComboCount < 30)
+            {
+                plusScore = ScoreFirstTerm + ScoreTorerance;
+            }
+            else if (30 <= ComboCount && ComboCount < 50)
+            {
+                plusScore = ScoreFirstTerm + ScoreTorerance * 2;
+            }
+            else if (50 <= ComboCount && ComboCount < 100)
+            {
+                plusScore = ScoreFirstTerm + ScoreTorerance * 4;
+            }
+            else
+            {
+                plusScore = ScoreFirstTerm + ScoreTorerance * 8;
+            }
+
+            Score += plusScore;
+        }
+        else if (result == "failure")
+        {
+            ComboCount = 0;
+        }
+        else
+        {
+            ComboCount = 0; // default failure
+            Debug.Log("hantei");
+        }
+
+        Debug.Log(ComboCount);
+        ComboText.text = ComboCount.ToString();
+        ScoreText.text = Score.ToString();
     }
 }

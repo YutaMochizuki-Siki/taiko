@@ -29,7 +29,7 @@ public class MessageEffectManager : MonoBehaviour
         Good.SetActive(false);
         Good.SetActive(true);
 
-        Observable.Timer(TimeSpan.FromMilliseconds(200))
+        Observable.Timer(TimeSpan.FromMilliseconds(500))
           .Subscribe(_ => Good.SetActive(false));
     }
 
@@ -38,7 +38,7 @@ public class MessageEffectManager : MonoBehaviour
         Failure.SetActive(false);
         Failure.SetActive(true);
 
-        Observable.Timer(TimeSpan.FromMilliseconds(200))
+        Observable.Timer(TimeSpan.FromMilliseconds(500))
           .Subscribe(_ => Failure.SetActive(false));
     }
 }
