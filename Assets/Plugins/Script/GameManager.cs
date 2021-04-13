@@ -48,8 +48,9 @@ public class GameManager : MonoBehaviour
     float CheckRange;
     float BeatRange;
     List<float> NoteTimings;
-    GameObject donclick;
-    Touchclick touchclick;
+    GameObject donclick, kaclick;
+    DonTouchClick dontouchclick;
+    KaTouchClick katouchclick;
 
     string Title;
     int BPM;
@@ -71,14 +72,13 @@ public class GameManager : MonoBehaviour
         get { return MessageEffectSubject; }
     }
 
-     void Start()
-    {
-        loadChart();
-        donclick = GameObject.Find("ButtonClick");
-        touchclick = donclick.GetComponent<Touchclick>();
-    }
+ 
     void OnEnable()
     {
+        donclick = GameObject.Find("DonButtonClick");
+        kaclick = GameObject.Find("KaButtonClick");
+        dontouchclick = donclick.GetComponent<DonTouchClick>();
+        katouchclick = kaclick.GetComponent<KaTouchClick>();
         Music = this.GetComponent<AudioSource>();
 
         Distance = Math.Abs(BeatPoint.position.x - SpawnPoint.position.x);
@@ -126,7 +126,7 @@ public class GameManager : MonoBehaviour
 
         this.UpdateAsObservable()
           .Where(_ => isPlaying)
-          .Where(_ => touchclick.clap || Input.GetMouseButton(0))
+          .Where(_ => dontouchclick.Clap)//touchclick.clap ||
           .Subscribe(_ => {
               beat("don", Time.time * 1000 - PlayTime);
               SoundEffectSubject.OnNext("don");
@@ -134,7 +134,7 @@ public class GameManager : MonoBehaviour
 
         this.UpdateAsObservable()
           .Where(_ => isPlaying)
-          .Where(_ => Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.K)|| Input.GetMouseButton(0))
+          .Where(_ => katouchclick.Clap)
           .Subscribe(_ => {
               beat("ka", Time.time * 1000 - PlayTime);
               SoundEffectSubject.OnNext("ka");
