@@ -24,6 +24,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] Text ScoreText; // 追加
     [SerializeField] Text ComboText; // 追加
     [SerializeField] Text TitleText; // 追加
+    [SerializeField] Slider LessHpgage;
+    [SerializeField] Slider MoreHpGage;
+
 
     AudioSource Music;
 
@@ -32,7 +35,8 @@ public class GameManager : MonoBehaviour
     float During;
     bool isPlaying;
     int GoIndex;
-
+    bool donclap;
+ 
     float ComboCount; // 追加
     float Score; // 追加
     float ScoreFirstTerm; // 追加
@@ -44,6 +48,8 @@ public class GameManager : MonoBehaviour
     float CheckRange;
     float BeatRange;
     List<float> NoteTimings;
+    GameObject donclick;
+    Touchclick touchclick;
 
     string Title;
     int BPM;
@@ -65,6 +71,12 @@ public class GameManager : MonoBehaviour
         get { return MessageEffectSubject; }
     }
 
+     void Start()
+    {
+        loadChart();
+        donclick = GameObject.Find("ButtonClick");
+        touchclick = donclick.GetComponent<Touchclick>();
+    }
     void OnEnable()
     {
         Music = this.GetComponent<AudioSource>();
@@ -114,7 +126,7 @@ public class GameManager : MonoBehaviour
 
         this.UpdateAsObservable()
           .Where(_ => isPlaying)
-          .Where(_ => Input.GetKeyDown(KeyCode.F) || Input.GetKeyDown(KeyCode.J))
+          .Where(_ => touchclick.clap || Input.GetMouseButton(0))
           .Subscribe(_ => {
               beat("don", Time.time * 1000 - PlayTime);
               SoundEffectSubject.OnNext("don");
@@ -122,11 +134,17 @@ public class GameManager : MonoBehaviour
 
         this.UpdateAsObservable()
           .Where(_ => isPlaying)
-          .Where(_ => Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.K))
+          .Where(_ => Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.K)|| Input.GetMouseButton(0))
           .Subscribe(_ => {
               beat("ka", Time.time * 1000 - PlayTime);
               SoundEffectSubject.OnNext("ka");
           });
+    }
+    bool dontap = false;
+    public bool hantei() {
+        dontap = true;
+
+        return dontap;
     }
 
     void loadChart()
@@ -247,8 +265,20 @@ else
         }
     }
 
+  float hp=0;
+
+    void HpGageAdd(float n) {
+        if ((hp + n >= 0) && (100 >= hp + n))
+        {
+            hp += n;
+            if (hp >= 80) { MoreHpGage.value += n; }
+            else { LessHpgage.value += n; }
+        }
+    }
+
     void updateScore(string result)
     {
+        float HpUp;
         if (result == "good")
         {
             ComboCount++;
@@ -257,37 +287,44 @@ else
             if (ComboCount < 10)
             {
                 plusScore = ScoreFirstTerm;
+                HpUp = 0.5f;
             }
             else if (10 <= ComboCount && ComboCount < 30)
             {
                 plusScore = ScoreFirstTerm + ScoreTorerance;
+                HpUp = 0.7f;
             }
             else if (30 <= ComboCount && ComboCount < 50)
             {
                 plusScore = ScoreFirstTerm + ScoreTorerance * 2;
+                HpUp = 0.8f;
+
             }
             else if (50 <= ComboCount && ComboCount < 100)
             {
                 plusScore = ScoreFirstTerm + ScoreTorerance * 4;
+                HpUp = 0.9f;
             }
             else
             {
                 plusScore = ScoreFirstTerm + ScoreTorerance * 8;
+                HpUp = 1.0f;
             }
-
             Score += plusScore;
         }
         else if (result == "failure")
         {
             ComboCount = 0;
+            HpUp = -1.0f;
         }
         else
         {
             ComboCount = 0; // default failure
+            HpUp = -2.0f;
             Debug.Log("hantei");
         }
 
-        Debug.Log(ComboCount);
+        HpGageAdd(HpUp);
         ComboText.text = ComboCount.ToString();
         ScoreText.text = Score.ToString();
     }
