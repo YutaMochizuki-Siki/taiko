@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
 using UniRx.Triggers;
+using UnityEngine.SceneManagement;
+
 
 public class GameManager : MonoBehaviour
 {
@@ -26,6 +28,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] Text TitleText; // 追加
     [SerializeField] Slider LessHpgage;
     [SerializeField] Slider MoreHpGage;
+    [SerializeField] Slider DelayChange;
 
 
     AudioSource Music;
@@ -47,10 +50,13 @@ public class GameManager : MonoBehaviour
 
     float CheckRange;
     float BeatRange;
+    float Delay = 330;
     List<float> NoteTimings;
     GameObject donclick, kaclick;
     DonTouchClick dontouchclick;
-    KaTouchClick katouchclick;
+    RkaTouchClick rkatouchclick;
+    LkaTouchClick lkatouchclick;
+    ScoreNum scorenum;
 
     string Title;
     int BPM;
@@ -72,13 +78,19 @@ public class GameManager : MonoBehaviour
         get { return MessageEffectSubject; }
     }
 
- 
+    private void Awake()
+    {
+        scorenum = ScoreNum.Instance;   
+    }
+
+
     void OnEnable()
     {
         donclick = GameObject.Find("DonButtonClick");
         kaclick = GameObject.Find("KaButtonClick");
         dontouchclick = donclick.GetComponent<DonTouchClick>();
-        katouchclick = kaclick.GetComponent<KaTouchClick>();
+       rkatouchclick = kaclick.GetComponent<RkaTouchClick>();
+        lkatouchclick = kaclick.GetComponent<LkaTouchClick>();
         Music = this.GetComponent<AudioSource>();
 
         Distance = Math.Abs(BeatPoint.position.x - SpawnPoint.position.x);
@@ -106,6 +118,7 @@ public class GameManager : MonoBehaviour
               GoIndex++;
           });
 
+
         // 追加
         this.UpdateAsObservable()
           .Where(_ => isPlaying)
@@ -126,18 +139,30 @@ public class GameManager : MonoBehaviour
 
         this.UpdateAsObservable()
           .Where(_ => isPlaying)
-          .Where(_ => dontouchclick.Clap)//touchclick.clap ||
+          .Where(_ => Notes.Count <= CheckTimingIndex)
           .Subscribe(_ => {
-              beat("don", Time.time * 1000 - PlayTime);
-              SoundEffectSubject.OnNext("don");
+              scorenum.setScore(Score.ToString());
+              scorenum.setHp(hp);
+              SceneManager.LoadScene("ScoreSene");
           });
 
         this.UpdateAsObservable()
           .Where(_ => isPlaying)
-          .Where(_ => katouchclick.Clap)
+          .Where(_ => dontouchclick.Clap)//touchclick.clap ||
+          .Subscribe(_ => {
+              beat("don", Time.time * 1000 - PlayTime);
+              SoundEffectSubject.OnNext("don");
+              dontouchclick.Clap = false;
+          });
+
+        this.UpdateAsObservable()
+          .Where(_ => isPlaying)
+          .Where(_ => rkatouchclick.Clap || lkatouchclick.Clap)
           .Subscribe(_ => {
               beat("ka", Time.time * 1000 - PlayTime);
               SoundEffectSubject.OnNext("ka");
+              rkatouchclick.Clap = false;
+              lkatouchclick.Clap = false;
           });
     }
     bool dontap = false;
@@ -162,7 +187,7 @@ public class GameManager : MonoBehaviour
         foreach (var note in json["notes"])
         {
             string type = note["type"].Get<string>();
-            float timing = float.Parse(note["timing"].Get<string>());
+            float timing = float.Parse(note["timing"].Get<string>())+Delay;
 
             GameObject Note;
             if (type == "don")
@@ -327,5 +352,6 @@ else
         HpGageAdd(HpUp);
         ComboText.text = ComboCount.ToString();
         ScoreText.text = Score.ToString();
+
     }
 }

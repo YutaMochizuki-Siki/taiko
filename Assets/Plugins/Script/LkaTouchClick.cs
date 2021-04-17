@@ -2,11 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class KaTouchClick : MonoBehaviour
+public class LkaTouchClick : MonoBehaviour
 {
     bool clap = false;
     public bool Clap
     {
+        set { this.clap = value; }
         get { return clap; }
     }
     // Start is called before the first frame update

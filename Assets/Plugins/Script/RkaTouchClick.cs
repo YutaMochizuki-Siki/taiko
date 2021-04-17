@@ -2,20 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public  class DonTouchClick : MonoBehaviour
+public class RkaTouchClick : MonoBehaviour
 {
     bool clap = false;
-   public  bool Clap{
+    public bool Clap
+    {
         set { this.clap = value; }
         get { return clap; }
     }
     // Start is called before the first frame update
 
-    public  void Don_Click() {
+    public void Ka_Click()
+    {
         clap = true;
     }
 
-   public  void Don_OffClick() {
+    public void Ka_OffClick()
+    {
         clap = false;
     }
 }
