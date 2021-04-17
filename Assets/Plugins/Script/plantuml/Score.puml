@@ -1,0 +1,14 @@
+@startuml
+class Score {
+    Start() : void
+    Update() : void
+    + button_click() : void
+    HpParamete(hp:float) : void
+}
+MonoBehaviour <|-- Score
+Score --> "LessHpGage" Slider
+Score --> "MoreHpGage" Slider
+Score --> "HanteiText" Text
+Score --> "ScoreText" Text
+Score --> "scorenum" ScoreNum
+@enduml

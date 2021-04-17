@@ -1,0 +1,9 @@
+@startuml
+class RkaTouchClick {
+    clap : bool = false
+    + Clap : bool <<set>> <<get>>
+    + Ka_Click() : void
+    + Ka_OffClick() : void
+}
+MonoBehaviour <|-- RkaTouchClick
+@enduml

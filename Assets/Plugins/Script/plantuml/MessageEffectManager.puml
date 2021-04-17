@@ -1,0 +1,11 @@
+@startuml
+class MessageEffectManager {
+    OnEnable() : void
+    goodShow() : void
+    failureShow() : void
+}
+MonoBehaviour <|-- MessageEffectManager
+MessageEffectManager --> "GameManager" GameManager
+MessageEffectManager --> "Good" GameObject
+MessageEffectManager --> "Failure" GameObject
+@enduml

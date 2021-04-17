@@ -1,0 +1,14 @@
+@startuml
+class ScoreNum {
+    - score_num : string
+    - hp : float
+    Awake() : void
+    + setScore(n:string) : void
+    + getScore() : string
+    + setHp(n:float) : void
+    + getHp() : float
+}
+MonoBehaviour <|-- ScoreNum
+ScoreNum --> "mInstance" ScoreNum
+ScoreNum --> "Instance" ScoreNum
+@enduml

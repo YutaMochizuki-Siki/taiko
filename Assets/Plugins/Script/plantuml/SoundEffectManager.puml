@@ -1,0 +1,11 @@
+@startuml
+class SoundEffectManager {
+    OnEnable() : void
+    donPlay() : void
+    kaPlay() : void
+}
+MonoBehaviour <|-- SoundEffectManager
+SoundEffectManager --> "GameManager" GameManager
+SoundEffectManager --> "DonPlayer" AudioSource
+SoundEffectManager --> "KaPlayer" AudioSource
+@enduml

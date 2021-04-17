@@ -1,0 +1,9 @@
+@startuml
+class DelaySlider {
+    Start() : void
+    Update() : void
+}
+MonoBehaviour <|-- DelaySlider
+DelaySlider --> "DelayChange" Slider
+DelaySlider --> "DelayText" Text
+@enduml

@@ -1,0 +1,150 @@
+@startuml
+class DelaySlider {
+    Start() : void
+    Update() : void
+}
+MonoBehaviour <|-- DelaySlider
+DelaySlider --> "DelayChange" Slider
+DelaySlider --> "DelayText" Text
+class DonTouchClick {
+    clap : bool = false
+    + Clap : bool <<set>> <<get>>
+    + Don_Click() : void
+    + Don_OffClick() : void
+}
+MonoBehaviour <|-- DonTouchClick
+class GameManager {
+    FilePath : string
+    ClipPath : string
+    PlayTime : float
+    Distance : float
+    During : float
+    isPlaying : bool
+    GoIndex : int
+    donclap : bool
+    ComboCount : float
+    Score : float
+    ScoreFirstTerm : float
+    ScoreTorerance : float
+    ScoreCeilingPoint : float
+    CheckTimingIndex : int
+    CheckRange : float
+    BeatRange : float
+    Delay : float = 330
+    Title : string
+    BPM : int
+    - Awake() : void
+    OnEnable() : void
+    dontap : bool = false
+    + hantei() : bool
+    loadChart() : void
+    play() : void
+    beat(type:string, timing:float) : void
+    hp : float = 0
+    HpGageAdd(n:float) : void
+    updateScore(result:string) : void
+}
+class "List`1"<T> {
+}
+class "Subject`1"<T> {
+}
+class "IObservable`1"<T> {
+}
+MonoBehaviour <|-- GameManager
+GameManager --> "Play" Button
+GameManager --> "SetChart" Button
+GameManager --> "Don" GameObject
+GameManager --> "Ka" GameObject
+GameManager --> "SpawnPoint" Transform
+GameManager --> "BeatPoint" Transform
+GameManager --> "ScoreText" Text
+GameManager --> "ComboText" Text
+GameManager --> "TitleText" Text
+GameManager --> "LessHpgage" Slider
+GameManager --> "MoreHpGage" Slider
+GameManager --> "DelayChange" Slider
+GameManager --> "Music" AudioSource
+GameManager --> "NoteTimings<float>" "List`1"
+GameManager --> "donclick" GameObject
+GameManager --> "kaclick" GameObject
+GameManager --> "dontouchclick" DonTouchClick
+GameManager --> "rkatouchclick" RkaTouchClick
+GameManager --> "lkatouchclick" LkaTouchClick
+GameManager --> "scorenum" ScoreNum
+GameManager --> "Notes<GameObject>" "List`1"
+GameManager o-> "SoundEffectSubject<string>" "Subject`1"
+GameManager --> "OnSoundEffect<string>" "IObservable`1"
+GameManager o-> "MessageEffectSubject<string>" "Subject`1"
+GameManager --> "OnMessageEffect<string>" "IObservable`1"
+class LkaTouchClick {
+    clap : bool = false
+    + Clap : bool <<set>> <<get>>
+    + Ka_Click() : void
+    + Ka_OffClick() : void
+}
+MonoBehaviour <|-- LkaTouchClick
+class MessageEffectManager {
+    OnEnable() : void
+    goodShow() : void
+    failureShow() : void
+}
+MonoBehaviour <|-- MessageEffectManager
+MessageEffectManager --> "GameManager" GameManager
+MessageEffectManager --> "Good" GameObject
+MessageEffectManager --> "Failure" GameObject
+class NoteController {
+    Type : string
+    Timing : float
+    Distance : float
+    During : float
+    isGo : bool
+    GoTime : float
+    OnEnable() : void
+    + setParameter(type:string, timing:float) : void
+    + getType() : string
+    + getTiming() : float
+    + go(distance:float, during:float) : void
+}
+MonoBehaviour <|-- NoteController
+NoteController --> "firstPos" Vector3
+class RkaTouchClick {
+    clap : bool = false
+    + Clap : bool <<set>> <<get>>
+    + Ka_Click() : void
+    + Ka_OffClick() : void
+}
+MonoBehaviour <|-- RkaTouchClick
+class Score {
+    Start() : void
+    Update() : void
+    + button_click() : void
+    HpParamete(hp:float) : void
+}
+MonoBehaviour <|-- Score
+Score --> "LessHpGage" Slider
+Score --> "MoreHpGage" Slider
+Score --> "HanteiText" Text
+Score --> "ScoreText" Text
+Score --> "scorenum" ScoreNum
+class ScoreNum {
+    - score_num : string
+    - hp : float
+    Awake() : void
+    + setScore(n:string) : void
+    + getScore() : string
+    + setHp(n:float) : void
+    + getHp() : float
+}
+MonoBehaviour <|-- ScoreNum
+ScoreNum --> "mInstance" ScoreNum
+ScoreNum --> "Instance" ScoreNum
+class SoundEffectManager {
+    OnEnable() : void
+    donPlay() : void
+    kaPlay() : void
+}
+MonoBehaviour <|-- SoundEffectManager
+SoundEffectManager --> "GameManager" GameManager
+SoundEffectManager --> "DonPlayer" AudioSource
+SoundEffectManager --> "KaPlayer" AudioSource
+@enduml

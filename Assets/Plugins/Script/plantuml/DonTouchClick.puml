@@ -1,0 +1,9 @@
+@startuml
+class DonTouchClick {
+    clap : bool = false
+    + Clap : bool <<set>> <<get>>
+    + Don_Click() : void
+    + Don_OffClick() : void
+}
+MonoBehaviour <|-- DonTouchClick
+@enduml

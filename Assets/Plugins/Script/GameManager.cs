@@ -187,7 +187,7 @@ public class GameManager : MonoBehaviour
         foreach (var note in json["notes"])
         {
             string type = note["type"].Get<string>();
-            float timing = float.Parse(note["timing"].Get<string>())+Delay;
+            float timing = float.Parse(note["timing"].Get<string>())+DelayChange.value;
 
             GameObject Note;
             if (type == "don")

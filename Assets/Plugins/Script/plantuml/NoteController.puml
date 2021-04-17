@@ -1,0 +1,17 @@
+@startuml
+class NoteController {
+    Type : string
+    Timing : float
+    Distance : float
+    During : float
+    isGo : bool
+    GoTime : float
+    OnEnable() : void
+    + setParameter(type:string, timing:float) : void
+    + getType() : string
+    + getTiming() : float
+    + go(distance:float, during:float) : void
+}
+MonoBehaviour <|-- NoteController
+NoteController --> "firstPos" Vector3
+@enduml

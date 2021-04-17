@@ -1,0 +1,65 @@
+@startuml
+class GameManager {
+    FilePath : string
+    ClipPath : string
+    PlayTime : float
+    Distance : float
+    During : float
+    isPlaying : bool
+    GoIndex : int
+    donclap : bool
+    ComboCount : float
+    Score : float
+    ScoreFirstTerm : float
+    ScoreTorerance : float
+    ScoreCeilingPoint : float
+    CheckTimingIndex : int
+    CheckRange : float
+    BeatRange : float
+    Delay : float = 330
+    Title : string
+    BPM : int
+    - Awake() : void
+    OnEnable() : void
+    dontap : bool = false
+    + hantei() : bool
+    loadChart() : void
+    play() : void
+    beat(type:string, timing:float) : void
+    hp : float = 0
+    HpGageAdd(n:float) : void
+    updateScore(result:string) : void
+}
+class "List`1"<T> {
+}
+class "Subject`1"<T> {
+}
+class "IObservable`1"<T> {
+}
+MonoBehaviour <|-- GameManager
+GameManager --> "Play" Button
+GameManager --> "SetChart" Button
+GameManager --> "Don" GameObject
+GameManager --> "Ka" GameObject
+GameManager --> "SpawnPoint" Transform
+GameManager --> "BeatPoint" Transform
+GameManager --> "ScoreText" Text
+GameManager --> "ComboText" Text
+GameManager --> "TitleText" Text
+GameManager --> "LessHpgage" Slider
+GameManager --> "MoreHpGage" Slider
+GameManager --> "DelayChange" Slider
+GameManager --> "Music" AudioSource
+GameManager --> "NoteTimings<float>" "List`1"
+GameManager --> "donclick" GameObject
+GameManager --> "kaclick" GameObject
+GameManager --> "dontouchclick" DonTouchClick
+GameManager --> "rkatouchclick" RkaTouchClick
+GameManager --> "lkatouchclick" LkaTouchClick
+GameManager --> "scorenum" ScoreNum
+GameManager --> "Notes<GameObject>" "List`1"
+GameManager o-> "SoundEffectSubject<string>" "Subject`1"
+GameManager --> "OnSoundEffect<string>" "IObservable`1"
+GameManager o-> "MessageEffectSubject<string>" "Subject`1"
+GameManager --> "OnMessageEffect<string>" "IObservable`1"
+@enduml
